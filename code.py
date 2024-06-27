@@ -38,12 +38,10 @@ else:
 
 #Función para conexión wifi
 def wifi_connect():
-    ssid = "UPB-SEXTO-PISO"
-    password = "UPB2024#"
+    ssid = "USUARIO"
+    password = "CONTRASEÑA"
     try:
         wifi.radio.connect(ssid, password)
-        #print("Conexion correcta")
-        #print(wifi.radio.ipv4_address)
         VERDE.value = True
         ROJO.value = False
     except Exception:
@@ -56,7 +54,6 @@ def consulta_db(query):
     socket = socketpool.SocketPool(wifi.radio)
     requests = adafruit_requests.Session(socket, ssl.create_default_context())
     url = "http://sunandenergies.com/proyectoenergia/datos.php"
-    #url = "http://pruebadatarp2.000webhostapp.com/datos.php"
     headers = {'content-type': 'application/x-www-form-urlencoded'}
     print("Sending data...",end="")
     try:
@@ -67,18 +64,6 @@ def consulta_db(query):
         VERDE.value = False
         ROJO.value = True
     print("Done!")
-
-def real_time():
-    actual = time.localtime()
-    año = actual[0]
-    mes = actual[1]
-    dia = actual[2]
-    hora = actual[3]
-    minuto = 0
-    segundo = 0
-    
-    TIME = str(año)+"-"+str(mes)+"-"+str(dia)+" "+str(hora)+":"+str(minuto)+":"+str(segundo)
-    return TIME
 
 #Función para convertir un numero en complemento a dos
 def complemento_a_dos(valor, bits=16):
@@ -142,18 +127,8 @@ while True:
         P_REACTIVA_SEND = combinar_datos(data_bytes_3) * 0.01
         print("P REACTIVA: ", P_REACTIVA_SEND)
         
-        time.sleep(1.5)
-        modbus.send("03", 806)
-        time.sleep(1.5)
-        p_aparente = modbus.receive()
-        print(p_aparente)
-        data_bytes_4 = p_aparente[3:5]
-        data_value_4 = (data_bytes_4[0] << 8) | data_bytes_4[1]
-        P_APARENTE_SEND = data_value_4 * 0.01
-        print("P APARENTE: ", P_APARENTE_SEND)
-        
         #Se configura una cadena de texto con las variables obtenidas
-        DATA_SEND = "energia="+str(ENERGY_SEND)+"&p_activa="+str(P_ACTIVA_SEND)+"&p_reactiva="+str(P_REACTIVA_SEND)+"&p_aparente="+str(P_APARENTE_SEND)
+        DATA_SEND = "energia="+str(ENERGY_SEND)+"&p_activa="+str(P_ACTIVA_SEND)+"&p_reactiva="+str(P_REACTIVA_SEND)
         print(DATA_SEND)
         #Se utiliza la función de consulta para enviar los datos a la base de datos web
         consulta_db(DATA_SEND)
